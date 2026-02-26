@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>人工智能基础概念介绍</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            padding: 60px 20px;
+            color: white;
+        }
+
+        header h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        header p {
+            font-size: 1.3rem;
+            opacity: 0.9;
+        }
+
+        .nav-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+
+        .nav-tab {
+            padding: 12px 24px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            border-radius: 25px;
+            color: white;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .nav-tab:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .nav-tab.active {
+            background: white;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .content-section {
+            display: none;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: fadeIn 0.5s ease;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .content-section h2 {
+            color: #667eea;
+            font-size: 2rem;
+            margin-bottom: 25px;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .concept-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .concept-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 15px;
+            padding: 25px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .concept-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .concept-card h3 {
+            color: #764ba2;
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+        }
+
+        .concept-card p {
+            color: #555;
+            line-height: 1.8;
+        }
+
+        .timeline {
+            position: relative;
+            padding-left: 40px;
+            margin-top: 30px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+            border-radius: 2px;
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -32px;
+            top: 25px;
+            width: 16px;
+            height: 16px;
+            background: #667eea;
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 0 0 3px #667eea;
+        }
+
+        .timeline-item h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .applications-list {
+            list-style: none;
+            margin-top: 20px;
+        }
+
+        .applications-list li {
+            padding: 15px;
+            margin-bottom: 15px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .applications-list li::before {
+            content: '🤖';
+            font-size: 1.5rem;
+        }
+
+        .quiz-container {
+            margin-top: 30px;
+        }
+
+        .quiz-question {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            border-left: 5px solid #667eea;
+        }
+
+        .quiz-question h4 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .quiz-option {
+            padding: 12px 20px;
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .quiz-option:hover {
+            border-color: #667eea;
+            background: #f0f3ff;
+        }
+
+        .quiz-option.correct {
+            background: #d4edda;
+            border-color: #28a745;
+            color: #155724;
+        }
+
+        .quiz-option.wrong {
+            background: #f8d7da;
+            border-color: #dc3545;
+            color: #721c24;
+        }
+
+        .submit-quiz {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.1rem;
+            border-radius: 30px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: transform 0.3s ease;
+        }
+
+        .submit-quiz:hover {
+            transform: scale(1.05);
+        }
+
+        .quiz-result {
+            margin-top: 25px;
+            padding: 25px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+            text-align: center;
+            font-size: 1.3rem;
+            display: none;
+        }
+
+        footer {
+            text-align: center;
+            padding: 40px 20px;
+            color: white;
+            margin-top: 40px;
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2rem;
+            }
+
+            .content-section {
+                padding: 25px;
+            }
+
+            .concept-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🧠 人工智能基础概念</h1>
+            <p>探索AI世界的奥秘，从零开始了解人工智能</p>
+        </header>
+
+        <nav class="nav-tabs">
+            <button class="nav-tab active" data-section="basics">基础概念</button>
+            <button class="nav-tab" data-section="history">发展历史</button>
+            <button class="nav-tab" data-section="applications">应用领域</button>
+            <button class="nav-tab" data-section="quiz">知识测验</button>
+        </nav>
+
+        <section id="basics" class="content-section active">
+            <h2>📚 基础概念</h2>
+            <p style="font-size: 1.1rem; margin-bottom: 20px;">人工智能（Artificial Intelligence, AI）是计算机科学的一个分支，致力于创建能够模拟人类智能的系统。</p>
+            
+            <div class="concept-grid">
+                <div class="concept-card">
+                    <h3>🤖 什么是人工智能？</h3>
+                    <p>人工智能是指使计算机系统能够执行通常需要人类智能的任务，如视觉感知、语音识别、决策制定和语言翻译等。</p>
+                </div>
+
+                <div class="concept-card">
+                    <h3>🧩 机器学习（ML）</h3>
+                    <p>机器学习是AI的一个子集，它使计算机能够从数据中学习和改进，而无需进行明确的编程。通过算法和统计模型，系统可以识别模式并做出预测。</p>
+                </div>
+
+                <div class="concept-card">
+                    <h3>🧠 深度学习</h3>
+                    <p>深度学习是机器学习的一个分支，使用多层神经网络来模拟人脑的工作方式。它在图像识别、自然语言处理等领域取得了突破性进展。</p>
+                </div>
+
+                <div class="concept-card">
+                    <h3>💬 自然语言处理（NLP）</h3>
+                    <p>NLP使计算机能够理解、解释和生成人类语言。这包括机器翻译、情感分析、语音识别和聊天机器人等应用。</p>
+                </div>
+
+                <div class="concept-card">
+                    <h3>👁️ 计算机视觉</h3>
+                    <p>计算机视觉使计算机能够从图像或视频中获取信息。应用包括人脸识别、物体检测、医学图像分析和自动驾驶等。</p>
+                </div>
+
+                <div class="concept-card">
+                    <h3>🤔 强AI vs 弱AI</h3>
+                    <p><strong>弱AI（窄AI）</strong>：专注于特定任务的AI，如语音助手。<br><strong>强AI（通用AI）</strong>：具有与人类相当的智能，能够执行任何智力任务（尚未实现）。</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="history" class="content-section">
+            <h2>📜 发展历史</h2>
+            <p style="font-size: 1.1rem; margin-bottom: 20px;">人工智能的发展经历了多个重要阶段，从理论设想到实际应用。</p>
+            
+            <div class="timeline">
+                <div class="timeline-item">
+                    <h4>1950年 - 图灵测试</h4>
+                    <p>艾伦·图灵提出了著名的"图灵测试"，用于判断机器是否具有智能。这篇论文《计算机器与智能》奠定了AI的理论基础。</p>
+                </div>
+
+                <div class="timeline-item">
+                    <h4>1956年 - AI正式诞生</h4>
+                    <p>在达特茅斯会议上，"人工智能"这一术语被正式提出。约翰·麦卡锡、马文·明斯基等先驱者相聚一堂，共同探讨机器智能的未来。</p>
+                </div>
+
+                <div class="timeline-item">
+                    <h4>1966-1973年 - 第一次AI寒冬</h4>
+                    <p>由于进展不如预期，AI研究资金大幅削减。但这段时期也孕育了重要的理论工作。</p>
+                </div>
+
+                <div class="timeline-item">
+                    <h4>1980年代 - 专家系统热潮</h4>
+                    <p>专家系统在商业领域获得成功，这是一种基于规则的AI系统，能够模拟人类专家的决策过程。</p>
+                </div>
+
+                <div class="timeline-item">
+                    <h4>1997年 - 深蓝战胜卡斯帕罗夫</h4>
+                    <p>IBM的"深蓝"超级计算机击败了国际象棋世界冠军加里·卡斯帕罗夫，展示了AI在特定领域的强大能力。</p>
+                </div>
+
+                <div class="timeline-item">
+                    <h4>2012年 - 深度学习革命</h4>
+                    <p>AlexNet在ImageNet图像识别竞赛中大幅超越传统方法，标志着深度学习时代的到来。卷积神经网络（CNN）开始成为主流。</p>
+                </div>
+
+                <div class="timeline-item">
+                    <h4>2016年 - AlphaGo震惊世界</h4>
+                    <p>Google DeepMind的AlphaGo击败了围棋世界冠军李世石。围棋被认为是AI最难攻克的棋类游戏之一，这次胜利具有里程碑意义。</p>
+                </div>
+
+                <div class="timeline-item">
+                    <h4>2020年至今 - 大语言模型时代</h4>
+                    <p>GPT、BERT等大语言模型取得突破性进展，AI在自然语言理解和生成方面展现出惊人的能力，开启了AI应用的新纪元。</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="applications" class="content-section">
+            <h2>🚀 应用领域</h2>
+            <p style="font-size: 1.1rem; margin-bottom: 20px;">人工智能正在改变我们生活的方方面面，以下是一些主要的应用领域。</p>
+            
+            <ul class="applications-list">
+                <li><strong>医疗健康：</strong>医学影像诊断、药物发现、个性化治疗方案、健康监测</li>
+                <li><strong>金融服务：</strong>欺诈检测、风险评估、算法交易、智能投顾、信用评分</li>
+                <li><strong>自动驾驶：</strong>环境感知、路径规划、决策控制、行人检测、交通标志识别</li>
+                <li><strong>教育科技：</strong>个性化学习、智能辅导系统、作业批改、学习风格分析</li>
+                <li><strong>智能家居：</strong>语音助手、智能安防、能源管理、家电控制、环境监测</li>
+                <li><strong>电子商务：</strong>推荐系统、个性化营销、客服机器人、价格优化、库存管理</li>
+                <li><strong>农业科技：</strong>作物监测、病虫害检测、产量预测、精准农业、无人机喷洒</li>
+                <li><strong>娱乐传媒：</strong>内容推荐、游戏AI、特效制作、音乐创作、视频剪辑</li>
+                <li><strong>法律服务：</strong>合同审查、法律研究、案例分析、文件分类、合规检查</li>
+                <li><strong>制造业：</strong>质量检测、预测性维护、供应链优化、机器人控制、流程自动化</li>
+            </ul>
+
+            <div class="concept-grid" style="margin-top: 40px;">
+                <div class="concept-card">
+                    <h3>💡 未来展望</h3>
+                    <p>AI技术将继续快速发展，我们可以期待在量子计算、脑机接口、通用人工智能等领域取得更多突破。同时，AI伦理、安全性和监管也将成为越来越重要的话题。</p>
+                </div>
+
+                <div class="concept-card">
+                    <h3>⚖️ 伦理考虑</h3>
+                    <p>AI的快速发展也带来了隐私保护、偏见消除、就业影响、透明度和责任归属等问题需要我们认真思考和解决。</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="quiz" class="content-section">
+            <h2>🎯 知识测验</h2>
+            <p style="font-size: 1.1rem; margin-bottom: 20px;">测试一下你对人工智能基础概念的掌握程度！</p>
+            
+            <div class="quiz-container" id="quizContainer">
+                <div class="quiz-question" data-answer="c">
+                    <h4>1. 什么是人工智能？</h4>
+                    <div class="quiz-options">
+                        <div class="quiz-option" data-option="a">a) 一种机器人</div>
+                        <div class="quiz-option" data-option="b">b) 一种编程语言</div>
+                        <div class="quiz-option" data-option="c">c) 使计算机能够模拟人类智能的技术</div>
+                        <div class="quiz-option" data-option="d">d) 一种数据库系统</div>
+                    </div>
+                </div>
+
+                <div class="quiz-question" data-answer="b">
+                    <h4>2. 机器学习与人工智能的关系是？</h4>
+                    <div class="quiz-options">
+                        <div class="quiz-option" data-option="a">a) 它们是相同的概念</div>
+                        <div class="quiz-option" data-option="b">b) 机器学习是人工智能的一个子集</div>
+                        <div class="quiz-option" data-option="c">c) 人工智能是机器学习的一个子集</div>
+                        <div class="quiz-option" data-option="d">d) 它们之间没有关系</div>
+                    </div>
+                </div>
+
+                <div class="quiz-question" data-answer="a">
+                    <h4>3. 深度学习主要基于什么技术？</h4>
+                    <div class="quiz-options">
+                        <div class="quiz-option" data-option="a">a) 人工神经网络</div>
+                        <div class="quiz-option" data-option="b">b) 决策树</div>
+                        <div class="quiz-option" data-option="c">c) 支持向量机</div>
+                        <div class="quiz-option" data-option="d">d) 聚类算法</div>
+                    </div>
+                </div>
+
+                <div class="quiz-question" data-answer="d">
+                    <h4>4. NLP是什么的缩写？</h4>
+                    <div class="quiz-options">
+                        <div class="quiz-option" data-option="a">a) Neural Learning Process</div>
+                        <div class="quiz-option" data-option="b">b) New Language Protocol</div>
+                        <div class="quiz-option" data-option="c">c) Natural Learning Program</div>
+                        <div class="quiz-option" data-option="d">d) Natural Language Processing</div>
+                    </div>
+                </div>
+
+                <div class="quiz-question" data-answer="c">
+                    <h4>5. AlphaGo主要应用了什么技术？</h4>
+                    <div class="quiz-options">
+                        <div class="quiz-option" data-option="a">a) 专家系统</div>
+                        <div class="quiz-option" data-option="b">b) 传统搜索算法</div>
+                        <div class="quiz-option" data-option="c">c) 深度学习和强化学习</div>
+                        <div class="quiz-option" data-option="d">d) 随机搜索</div>
+                    </div>
+                </div>
+
+                <button class="submit-quiz" onclick="submitQuiz()">提交答案</button>
+                <div class="quiz-result" id="quizResult"></div>
+            </div>
+        </section>
+
+        <footer>
+            <p>© 2026 人工智能基础概念介绍 | 让AI知识触手可及</p>
+        </footer>
+    </div>
+
+    <script>
+        // 标签页切换
+        const navTabs = document.querySelectorAll('.nav-tab');
+        const contentSections = document.querySelectorAll('.content-section');
+
+        navTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const targetSection = tab.getAttribute('data-section');
+                
+                navTabs.forEach(t => t.classList.remove('active'));
+                contentSections.forEach(s => s.classList.remove('active'));
+                
+                tab.classList.add('active');
+                document.getElementById(targetSection).classList.add('active');
+            });
+        });
+
+        // 测验功能
+        let userAnswers = {};
+
+        document.querySelectorAll('.quiz-option').forEach(option => {
+            option.addEventListener('click', function() {
+                const question = this.closest('.quiz-question');
+                const questionIndex = Array.from(document.querySelectorAll('.quiz-question')).indexOf(question);
+                
+                question.querySelectorAll('.quiz-option').forEach(opt => opt.classList.remove('selected'));
+                this.classList.add('selected');
+                userAnswers[questionIndex] = this.getAttribute('data-option');
+            });
+        });
+
+        function submitQuiz() {
+            const questions = document.querySelectorAll('.quiz-question');
+            let correctCount = 0;
+
+            questions.forEach((question, index) => {
+                const correctAnswer = question.getAttribute('data-answer');
+                const userAnswer = userAnswers[index];
+
+                question.querySelectorAll('.quiz-option').forEach(option => {
+                    option.style.pointerEvents = 'none';
+                    const optionLetter = option.getAttribute('data-option');
+                    
+                    if (optionLetter === correctAnswer) {
+                        option.classList.add('correct');
+                    } else if (optionLetter === userAnswer && userAnswer !== correctAnswer) {
+                        option.classList.add('wrong');
+                    }
+                });
+
+                if (userAnswer === correctAnswer) {
+                    correctCount++;
+                }
+            });
+
+            const resultDiv = document.getElementById('quizResult');
+            const percentage = (correctCount / questions.length * 100).toFixed(0);
+            let message = '';
+
+            if (percentage >= 80) {
+                message = '🎉 优秀！你对AI的了解很深入！';
+            } else if (percentage >= 60) {
+                message = '👍 不错！继续学习，你会掌握更多AI知识！';
+            } else {
+                message = '📚 加油！建议重新阅读前面的内容再试一次！';
+            }
+
+            resultDiv.innerHTML = `<strong>得分：${correctCount}/${questions.length} (${percentage}%)</strong><br><br>${message}`;
+            resultDiv.style.display = 'block';
+            
+            document.querySelector('.submit-quiz').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
