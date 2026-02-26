@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>番茄钟 - Pomodoro Timer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        @media (max-width: 900px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        .timer-section {
+            text-align: center;
+        }
+
+        .timer-display {
+            font-size: 6rem;
+            font-weight: bold;
+            color: #667eea;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+        }
+
+        .timer-controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .timer-modes {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .mode-btn {
+            padding: 10px 20px;
+            border: 2px solid #667eea;
+            background: white;
+            color: #667eea;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .mode-btn.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .mode-btn:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .session-form {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #f0f0f0;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .calendar-section h2,
+        .timer-section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .calendar-header h3 {
+            color: #333;
+            font-size: 1.2rem;
+        }
+
+        .calendar-nav {
+            display: flex;
+            gap: 10px;
+        }
+
+        .calendar-nav button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .calendar-nav button:hover {
+            background: #5a6fd6;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+        }
+
+        .calendar-day-header {
+            text-align: center;
+            font-weight: 600;
+            color: #667eea;
+            padding: 10px;
+        }
+
+        .calendar-day {
+            text-align: center;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-height: 50px;
+        }
+
+        .calendar-day:hover {
+            background: #f0f0f0;
+        }
+
+        .calendar-day.today {
+            background: #667eea;
+            color: white;
+        }
+
+        .calendar-day.has-sessions {
+            position: relative;
+        }
+
+        .calendar-day.has-sessions::after {
+            content: '';
+            position: absolute;
+            bottom: 5px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 8px;
+            height: 8px;
+            background: #ff6b6b;
+            border-radius: 50%;
+        }
+
+        .calendar-day.empty {
+            background: #fafafa;
+            cursor: default;
+        }
+
+        .records-section {
+            margin-top: 30px;
+            grid-column: 1 / -1;
+        }
+
+        .records-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .records-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .record-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+
+        .record-info {
+            flex: 1;
+        }
+
+        .record-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .record-details {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .record-delete {
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .record-delete:hover {
+            background: #ff5252;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 1s ease;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 10px;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .settings-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid #f0f0f0;
+        }
+
+        .settings-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+
+        @media (max-width: 600px) {
+            .settings-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .setting-item {
+            text-align: center;
+        }
+
+        .setting-item label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .setting-item input {
+            width: 80px;
+            padding: 8px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            text-align: center;
+            transition: border-color 0.3s ease;
+        }
+
+        .setting-item input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .settings-actions {
+            margin-top: 15px;
+            text-align: center;
+        }
+
+        .settings-toggle {
+            background: none;
+            border: 2px dashed #667eea;
+            color: #667eea;
+            padding: 10px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .settings-toggle:hover {
+            background: #667eea;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🍅 番茄钟</h1>
+            <p>专注工作，高效学习</p>
+        </header>
+
+        <div class="main-content">
+            <!-- 计时器部分 -->
+            <div class="card timer-section">
+                <h2>计时器</h2>
+                
+                <div class="stats">
+                    <div class="stat-item">
+                        <div class="stat-value" id="todaySessions">0</div>
+                        <div class="stat-label">今日专注</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="totalMinutes">0</div>
+                        <div class="stat-label">总分钟数</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="streak">0</div>
+                        <div class="stat-label">连续天数</div>
+                    </div>
+                </div>
+
+                <div class="timer-modes">
+                    <button class="mode-btn active" data-mode="pomodoro">工作 25分钟</button>
+                    <button class="mode-btn" data-mode="shortBreak">短休息 5分钟</button>
+                    <button class="mode-btn" data-mode="longBreak">长休息 15分钟</button>
+                </div>
+
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill" style="width: 100%"></div>
+                </div>
+
+                <div class="timer-display" id="timerDisplay">25:00</div>
+
+                <div class="timer-controls">
+                    <button class="btn btn-primary" id="startBtn">开始</button>
+                    <button class="btn btn-secondary" id="pauseBtn" style="display: none;">暂停</button>
+                    <button class="btn btn-secondary" id="resetBtn">重置</button>
+                </div>
+
+                <div class="session-form">
+                    <div class="form-group">
+                        <label for="taskTitle">任务标题</label>
+                        <input type="text" id="taskTitle" placeholder="输入您正在完成的任务...">
+                    </div>
+                    <div class="form-group">
+                        <label for="taskNotes">备注（可选）</label>
+                        <textarea id="taskNotes" rows="2" placeholder="添加备注..."></textarea>
+                    </div>
+                    <button class="btn btn-primary" id="saveRecordBtn" style="width: 100%;">保存记录</button>
+                </div>
+
+                <div class="settings-section">
+                    <div class="settings-actions">
+                        <button class="settings-toggle" id="settingsToggle">⚙️ 自定义时间设置</button>
+                    </div>
+                    <div id="settingsPanel" style="display: none; margin-top: 15px;">
+                        <div class="settings-grid">
+                            <div class="setting-item">
+                                <label>工作时间（分钟）</label>
+                                <input type="number" id="pomodoroDuration" min="1" max="120" value="25">
+                            </div>
+                            <div class="setting-item">
+                                <label>短休息（分钟）</label>
+                                <input type="number" id="shortBreakDuration" min="1" max="60" value="5">
+                            </div>
+                            <div class="setting-item">
+                                <label>长休息（分钟）</label>
+                                <input type="number" id="longBreakDuration" min="1" max="120" value="15">
+                            </div>
+                        </div>
+                        <div style="margin-top: 15px; text-align: center;">
+                            <button class="btn btn-primary" id="applySettings">应用设置</button>
+                            <button class="btn btn-secondary" id="resetSettings" style="margin-left: 10px;">恢复默认</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 日历部分 -->
+            <div class="card calendar-section">
+                <h2>日历</h2>
+                <div class="calendar-header">
+                    <div class="calendar-nav">
+                        <button id="prevMonth"><</button>
+                        <button id="nextMonth">></button>
+                    </div>
+                    <h3 id="currentMonth"></h3>
+                </div>
+                <div class="calendar-grid" id="calendarGrid"></div>
+            </div>
+        </div>
+
+        <!-- 记录部分 -->
+        <div class="card records-section">
+            <div class="records-header">
+                <h2>专注记录</h2>
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn btn-secondary" id="exportCsvBtn">导出 CSV</button>
+                    <button class="btn btn-secondary" id="exportJsonBtn">导出 JSON</button>
+                    <button class="btn btn-secondary" id="clearAllBtn" style="background: #ff6b6b; color: white;">清空记录</button>
+                </div>
+            </div>
+            <div class="records-list" id="recordsList"></div>
+        </div>
+    </div>
+
+    <script>
+        // 默认时长（秒）
+        const defaultDurations = {
+            pomodoro: 25 * 60,
+            shortBreak: 5 * 60,
+            longBreak: 15 * 60
+        };
+
+        // 从localStorage加载保存的时长设置，或使用默认值
+        let savedDurations = JSON.parse(localStorage.getItem('pomodoroDurations') || 'null');
+        let modeDurations = savedDurations || { ...defaultDurations };
+
+        // 状态管理
+        let currentMode = 'pomodoro';
+        let timeLeft = modeDurations.pomodoro;
+        let totalTime = modeDurations.pomodoro;
+        let timerInterval = null;
+        let isRunning = false;
+        let currentDate = new Date();
+        let selectedDate = new Date();
+        let records = JSON.parse(localStorage.getItem('pomodoroRecords') || '[]');
+
+        // DOM 元素
+        const timerDisplay = document.getElementById('timerDisplay');
+        const startBtn = document.getElementById('startBtn');
+        const pauseBtn = document.getElementById('pauseBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const progressFill = document.getElementById('progressFill');
+        const modeButtons = document.querySelectorAll('.mode-btn');
+        const prevMonthBtn = document.getElementById('prevMonth');
+        const nextMonthBtn = document.getElementById('nextMonth');
+        const currentMonthEl = document.getElementById('currentMonth');
+        const calendarGrid = document.getElementById('calendarGrid');
+        const recordsList = document.getElementById('recordsList');
+        const saveRecordBtn = document.getElementById('saveRecordBtn');
+        const taskTitle = document.getElementById('taskTitle');
+        const taskNotes = document.getElementById('taskNotes');
+        const exportCsvBtn = document.getElementById('exportCsvBtn');
+        const exportJsonBtn = document.getElementById('exportJsonBtn');
+        const clearAllBtn = document.getElementById('clearAllBtn');
+        const todaySessionsEl = document.getElementById('todaySessions');
+        const totalMinutesEl = document.getElementById('totalMinutes');
+        const streakEl = document.getElementById('streak');
+        const settingsToggle = document.getElementById('settingsToggle');
+        const settingsPanel = document.getElementById('settingsPanel');
+        const applySettingsBtn = document.getElementById('applySettings');
+        const resetSettingsBtn = document.getElementById('resetSettings');
+        const pomodoroDurationInput = document.getElementById('pomodoroDuration');
+        const shortBreakDurationInput = document.getElementById('shortBreakDuration');
+        const longBreakDurationInput = document.getElementById('longBreakDuration');
+
+        // 格式化时间显示
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        // 更新计时器显示
+        function updateTimerDisplay() {
+            timerDisplay.textContent = formatTime(timeLeft);
+            const progress = (timeLeft / totalTime) * 100;
+            progressFill.style.width = `${progress}%`;
+        }
+
+        // 开始计时器
+        function startTimer() {
+            if (isRunning) return;
+            isRunning = true;
+            startBtn.style.display = 'none';
+            pauseBtn.style.display = 'inline-block';
+            
+            timerInterval = setInterval(() => {
+                if (timeLeft > 0) {
+                    timeLeft--;
+                    updateTimerDisplay();
+                } else {
+                    clearInterval(timerInterval);
+                    isRunning = false;
+                    startBtn.style.display = 'inline-block';
+                    pauseBtn.style.display = 'none';
+                    playNotification();
+                    if (currentMode === 'pomodoro') {
+                        saveAutoRecord();
+                    }
+                }
+            }, 1000);
+        }
+
+        // 暂停计时器
+        function pauseTimer() {
+            if (!isRunning) return;
+            isRunning = false;
+            clearInterval(timerInterval);
+            startBtn.style.display = 'inline-block';
+            pauseBtn.style.display = 'none';
+        }
+
+        // 重置计时器
+        function resetTimer() {
+            pauseTimer();
+            timeLeft = modeDurations[currentMode];
+            totalTime = modeDurations[currentMode];
+            updateTimerDisplay();
+        }
+
+        // 切换模式
+        function switchMode(mode) {
+            currentMode = mode;
+            modeButtons.forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.mode === mode);
+            });
+            resetTimer();
+        }
+
+        // 播放通知
+        function playNotification() {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.value = 800;
+            oscillator.type = 'sine';
+            gainNode.gain.value = 0.3;
+            
+            oscillator.start();
+            setTimeout(() => {
+                oscillator.stop();
+            }, 500);
+        }
+
+        // 保存自动记录
+        function saveAutoRecord() {
+            const record = {
+                id: Date.now(),
+                title: taskTitle.value || '未命名任务',
+                notes: taskNotes.value,
+                duration: modeDurations[currentMode] / 60,
+                date: new Date().toISOString(),
+                mode: currentMode
+            };
+            records.unshift(record);
+            saveRecords();
+            renderRecords();
+            updateStats();
+            renderCalendar();
+            taskTitle.value = '';
+            taskNotes.value = '';
+        }
+
+        // 保存记录
+        function saveRecords() {
+            localStorage.setItem('pomodoroRecords', JSON.stringify(records));
+        }
+
+        // 渲染日历
+        function renderCalendar() {
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            
+            currentMonthEl.textContent = `${year}年${month + 1}月`;
+            
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const today = new Date();
+            
+            calendarGrid.innerHTML = '';
+            
+            const dayNames = ['日', '一', '二', '三', '四', '五', '六'];
+            dayNames.forEach(name => {
+                const header = document.createElement('div');
+                header.className = 'calendar-day-header';
+                header.textContent = name;
+                calendarGrid.appendChild(header);
+            });
+            
+            for (let i = 0; i < firstDay; i++) {
+                const emptyDay = document.createElement('div');
+                emptyDay.className = 'calendar-day empty';
+                calendarGrid.appendChild(emptyDay);
+            }
+            
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayEl = document.createElement('div');
+                dayEl.className = 'calendar-day';
+                dayEl.textContent = day;
+                
+                const currentDayDate = new Date(year, month, day);
+                const dateStr = currentDayDate.toDateString();
+                
+                if (today.toDateString() === dateStr) {
+                    dayEl.classList.add('today');
+                }
+                
+                const hasSessions = records.some(r => {
+                    const recordDate = new Date(r.date);
+                    return recordDate.toDateString() === dateStr;
+                });
+                
+                if (hasSessions) {
+                    dayEl.classList.add('has-sessions');
+                }
+                
+                dayEl.addEventListener('click', () => {
+                    selectedDate = new Date(year, month, day);
+                    renderRecords();
+                });
+                
+                calendarGrid.appendChild(dayEl);
+            }
+        }
+
+        // 渲染记录列表
+        function renderRecords() {
+            const selectedDateStr = selectedDate.toDateString();
+            const filteredRecords = records.filter(r => {
+                const recordDate = new Date(r.date);
+                return recordDate.toDateString() === selectedDateStr;
+            });
+            
+            if (filteredRecords.length === 0) {
+                recordsList.innerHTML = '<div style="text-align: center; color: #999; padding: 40px;">暂无记录</div>';
+                return;
+            }
+            
+            recordsList.innerHTML = filteredRecords.map(record => {
+                const date = new Date(record.date);
+                const timeStr = date.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
+                return `
+                    <div class="record-item">
+                        <div class="record-info">
+                            <div class="record-title">${escapeHtml(record.title)}</div>
+                            <div class="record-details">
+                                ${timeStr} · ${record.duration}分钟
+                                ${record.notes ? ' · ' + escapeHtml(record.notes) : ''}
+                            </div>
+                        </div>
+                        <button class="record-delete" onclick="deleteRecord(${record.id})">删除</button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // 删除记录
+        function deleteRecord(id) {
+            if (confirm('确定要删除这条记录吗？')) {
+                records = records.filter(r => r.id !== id);
+                saveRecords();
+                renderRecords();
+                updateStats();
+                renderCalendar();
+            }
+        }
+
+        // 更新统计数据
+        function updateStats() {
+            const today = new Date().toDateString();
+            const todayRecords = records.filter(r => {
+                const recordDate = new Date(r.date);
+                return recordDate.toDateString() === today;
+            });
+            
+            todaySessionsEl.textContent = todayRecords.length;
+            totalMinutesEl.textContent = Math.floor(records.reduce((sum, r) => sum + r.duration, 0));
+            streakEl.textContent = calculateStreak();
+        }
+
+        // 计算连续天数
+        function calculateStreak() {
+            if (records.length === 0) return 0;
+            
+            const uniqueDates = [...new Set(records.map(r => {
+                const date = new Date(r.date);
+                return new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
+            }))].sort((a, b) => b - a);
+            
+            let streak = 0;
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            for (let i = 0; i < uniqueDates.length; i++) {
+                const checkDate = new Date(today);
+                checkDate.setDate(checkDate.getDate() - i);
+                checkDate.setHours(0, 0, 0, 0);
+                
+                if (uniqueDates.includes(checkDate.getTime())) {
+                    streak++;
+                } else if (i > 0) {
+                    break;
+                }
+            }
+            
+            return streak;
+        }
+
+        // 导出 CSV
+        function exportCsv() {
+            const headers = ['日期', '时间', '任务标题', '备注', '时长(分钟)', '类型'];
+            const rows = records.map(r => {
+                const date = new Date(r.date);
+                return [
+                    date.toLocaleDateString('zh-CN'),
+                    date.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' }),
+                    `"${r.title.replace(/"/g, '""')}"`,
+                    `"${(r.notes || '').replace(/"/g, '""')}"`,
+                    r.duration,
+                    r.mode === 'pomodoro' ? '工作' : r.mode === 'shortBreak' ? '短休息' : '长休息'
+                ].join(',');
+            });
+            
+            const csvContent = [headers.join(','), ...rows].join('\n');
+            downloadFile(csvContent, 'pomodoro_records.csv', 'text/csv');
+        }
+
+        // 导出 JSON
+        function exportJson() {
+            const jsonContent = JSON.stringify(records, null, 2);
+            downloadFile(jsonContent, 'pomodoro_records.json', 'application/json');
+        }
+
+        // 下载文件
+        function downloadFile(content, filename, mimeType) {
+            const blob = new Blob([content], { type: mimeType });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // 清空所有记录
+        function clearAllRecords() {
+            if (confirm('确定要清空所有记录吗？此操作不可恢复！')) {
+                records = [];
+                saveRecords();
+                renderRecords();
+                updateStats();
+                renderCalendar();
+            }
+        }
+
+        // HTML 转义
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // 更新模式按钮显示
+        function updateModeButtons() {
+            modeButtons.forEach(btn => {
+                const mode = btn.dataset.mode;
+                const minutes = modeDurations[mode] / 60;
+                let label = '';
+                if (mode === 'pomodoro') label = '工作';
+                else if (mode === 'shortBreak') label = '短休息';
+                else if (mode === 'longBreak') label = '长休息';
+                btn.textContent = `${label} ${minutes}分钟`;
+            });
+        }
+
+        // 应用设置
+        function applySettings() {
+            const pomodoroMin = parseInt(pomodoroDurationInput.value) || 25;
+            const shortBreakMin = parseInt(shortBreakDurationInput.value) || 5;
+            const longBreakMin = parseInt(longBreakDurationInput.value) || 15;
+
+            // 验证输入范围
+            const clampedPomodoro = Math.min(Math.max(pomodoroMin, 1), 120);
+            const clampedShortBreak = Math.min(Math.max(shortBreakMin, 1), 60);
+            const clampedLongBreak = Math.min(Math.max(longBreakMin, 1), 120);
+
+            // 更新输入框显示为钳制后的值
+            pomodoroDurationInput.value = clampedPomodoro;
+            shortBreakDurationInput.value = clampedShortBreak;
+            longBreakDurationInput.value = clampedLongBreak;
+
+            // 更新时长设置
+            modeDurations = {
+                pomodoro: clampedPomodoro * 60,
+                shortBreak: clampedShortBreak * 60,
+                longBreak: clampedLongBreak * 60
+            };
+
+            // 保存到localStorage
+            localStorage.setItem('pomodoroDurations', JSON.stringify(modeDurations));
+
+            // 更新界面
+            updateModeButtons();
+            resetTimer();
+
+            alert('设置已应用！');
+        }
+
+        // 恢复默认设置
+        function resetToDefaultSettings() {
+            if (confirm('确定要恢复默认设置吗？')) {
+                modeDurations = { ...defaultDurations };
+                localStorage.removeItem('pomodoroDurations');
+
+                // 更新输入框
+                pomodoroDurationInput.value = defaultDurations.pomodoro / 60;
+                shortBreakDurationInput.value = defaultDurations.shortBreak / 60;
+                longBreakDurationInput.value = defaultDurations.longBreak / 60;
+
+                // 更新界面
+                updateModeButtons();
+                resetTimer();
+            }
+        }
+
+        // 切换设置面板显示
+        function toggleSettingsPanel() {
+            const isHidden = settingsPanel.style.display === 'none';
+            settingsPanel.style.display = isHidden ? 'block' : 'none';
+        }
+
+        // 初始化设置面板输入框
+        function initSettingsInputs() {
+            pomodoroDurationInput.value = modeDurations.pomodoro / 60;
+            shortBreakDurationInput.value = modeDurations.shortBreak / 60;
+            longBreakDurationInput.value = modeDurations.longBreak / 60;
+        }
+
+        // 事件监听
+        startBtn.addEventListener('click', startTimer);
+        pauseBtn.addEventListener('click', pauseTimer);
+        resetBtn.addEventListener('click', resetTimer);
+        saveRecordBtn.addEventListener('click', saveAutoRecord);
+
+        modeButtons.forEach(btn => {
+            btn.addEventListener('click', () => switchMode(btn.dataset.mode));
+        });
+
+        prevMonthBtn.addEventListener('click', () => {
+            currentDate.setMonth(currentDate.getMonth() - 1);
+            renderCalendar();
+        });
+
+        nextMonthBtn.addEventListener('click', () => {
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            renderCalendar();
+        });
+
+        exportCsvBtn.addEventListener('click', exportCsv);
+        exportJsonBtn.addEventListener('click', exportJson);
+        clearAllBtn.addEventListener('click', clearAllRecords);
+
+        // 设置面板事件监听
+        settingsToggle.addEventListener('click', toggleSettingsPanel);
+        applySettingsBtn.addEventListener('click', applySettings);
+        resetSettingsBtn.addEventListener('click', resetToDefaultSettings);
+
+        // 初始化
+        initSettingsInputs();
+        updateModeButtons();
+        updateTimerDisplay();
+        renderCalendar();
+        renderRecords();
+        updateStats();
+    </script>
+</body>
+</html>
