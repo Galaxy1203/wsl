@@ -17,11 +17,16 @@ response = client.responses.create(
             "content": [
                 {
                     "type": "input_text",
-                    "text": "你知道今天的日期吗"
+                    "text": "上午好"
                 },
             ],
         }
     ]
 )
 
-print(response)
+# 只输出模型的回复内容
+for output in response.output:
+    if hasattr(output, 'type') and output.type == 'message':
+        for content in output.content:
+            if content.type == "output_text":
+                print(content.text)
