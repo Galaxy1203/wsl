@@ -1,5 +1,5 @@
 venv/
-quant_env/
+quant/quant_env/
 __pycache__/
 *.pyc
 *.pyo
